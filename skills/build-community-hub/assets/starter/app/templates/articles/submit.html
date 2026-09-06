@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}投稿 · {{ community.site.name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>投稿文章</h1>
+  <p class="sub">粘贴正文（我们会自动整理为规范 Markdown）或上传 .md/.txt 文件；审核通过后发表</p>
+</div>
+<form class="form-card" method="post" action="/articles/submit" enctype="multipart/form-data">
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+  <label class="field">标题 <span class="req">*</span></label>
+  <input type="text" name="title" required>
+  <label class="field">归属 <span class="req">*</span>（这篇文章属于哪门人生课或专业课）</label>
+  <input type="text" id="tag_search" list="tag_options"
+         placeholder="输入课程名或主题名即可匹配" autocomplete="off" required>
+  <datalist id="tag_options">
+    {% for t in topics %}
+    <option value="人生课 · {{ t.title }}" data-kind="topic" data-slug="{{ t.slug }}">{{ t.description }}</option>
+    {% endfor %}
+    {% for c in courses %}
+    <option value="专业课 · {{ c.name }}（{{ c.semester }}）" data-kind="course" data-slug="{{ c.slug }}"></option>
+    {% endfor %}
+  </datalist>
+  <input type="hidden" name="topic_slug" id="topic_slug">
+  <input type="hidden" name="course_slug" id="course_slug">
+  <label class="field">正文（从 Word/备忘录直接粘贴即可）</label>
+  <textarea name="body" placeholder="在此粘贴文章正文……"></textarea>
+  <label class="field">或上传文件（.md / .txt）</label>
+  <input type="file" name="file" accept=".md,.txt">
+  <button class="btn" type="submit">提交审核</button>
+</form>
+<script>
+(function () {
+  var input = document.getElementById("tag_search");
+  var options = document.querySelectorAll("#tag_options option");
+  function sync() {
+    var v = input.value;
+    document.getElementById("topic_slug").value = "";
+    document.getElementById("course_slug").value = "";
+    options.forEach(function (o) {
+      if (o.value === v) {
+        document.getElementById(o.dataset.kind + "_slug").value = o.dataset.slug;
+      }
+    });
+  }
+  input.addEventListener("input", sync);
+  input.addEventListener("change", sync);
+})();
+</script>
+{% endblock %}

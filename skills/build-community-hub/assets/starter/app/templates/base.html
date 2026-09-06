@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="{{ community.site.locale }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ community.site.name }}{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="/static/logo.svg">
+  <link rel="stylesheet" href="/static/style.css?v={{ static_version() }}">
+  <style>:root { --purple: {{ community.theme.primary }}; --red: {{ community.theme.accent }}; }</style>
+</head>
+<body>
+{% set p = request.url.path %}
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="/">
+      <img class="brand-logo" src="/static/logo.svg" alt="">
+      <span class="brand-name">{{ community.site.short_name }}<small>{{ community.site.community_name }}</small></span>
+    </a>
+    {% if request.state.user %}
+    <nav class="nav">
+      <a href="/" class="{{ 'active' if p == '/' }}">{{ community.labels.home }}</a>
+      {% if community.features.guides %}<a href="/guides" class="{{ 'active' if p.startswith('/guides') }}">{{ community.labels.guides }}</a>{% endif %}
+      {% if community.features.articles %}<a href="/articles" class="{{ 'active' if p.startswith('/articles') }}">{{ community.labels.articles }}</a>{% endif %}
+      {% if community.features.events %}<a href="/events" class="{{ 'active' if p.startswith('/events') }}">{{ community.labels.events }}</a>{% endif %}
+      {% if community.features.plaza %}<a href="/plaza" class="{{ 'active' if p.startswith('/plaza') }}">{{ community.labels.plaza }}</a>{% endif %}
+      {% if community.features.contributions %}<a href="/contribute" class="{{ 'active' if p.startswith('/contribute') }}">{{ community.labels.contributions }}</a>{% endif %}
+      {% if request.state.user.role == "admin" %}
+      <a href="/admin" class="admin-link {{ 'active' if p.startswith('/admin') }}">{{ community.labels.admin }}</a>
+      {% endif %}
+    </nav>
+    <span class="user-chip">
+      {{ request.state.user.display_name }}
+      <a href="/logout">退出</a>
+    </span>
+    {% endif %}
+  </div>
+</header>
+<main class="{% block mainclass %}{% endblock %}">
+{% block content %}{% endblock %}
+</main>
+</body>
+</html>

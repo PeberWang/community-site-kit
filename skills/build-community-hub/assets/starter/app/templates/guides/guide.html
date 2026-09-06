@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}{{ title }} · {{ community.site.name }}{% endblock %}
+{% block content %}
+<p class="back-link"><a href="{{ back_url }}">← 返回指南</a></p>
+
+<article class="guide-page">
+  <header class="guide-hero">
+    <p class="breadcrumb">指南 {% if course %}/ {{ course.semester }} / {{ course.name }}{% elif topic %}/ 人生课 / {{ topic.title }}{% endif %}</p>
+    <h1>{{ title }}</h1>
+    {% if course %}
+    <div class="guide-tags">
+      {% if course.semester %}<span>{{ course.semester }}</span>{% endif %}
+      {% if course.course_type %}<span>{{ course.course_type }}</span>{% endif %}
+      {% if course.exam and course.exam != "其他" %}<span>{{ course.exam }}</span>{% endif %}
+    </div>
+    {% endif %}
+    {% if guide %}
+    <p class="guide-byline">
+      {% if course and course.teacher %}{{ course.teacher }} · {% endif %}
+      更新于 {{ guide.updated_at[:16].replace("T", " ") }} · v{{ guide.version }}
+    </p>
+    {% endif %}
+    {% if guide_callout %}
+    <p class="guide-callout"><strong>{% if course %}一句话学法{% else %}一句话行动{% endif %}</strong>{{ guide_callout }}</p>
+    {% elif description %}<p class="guide-callout">{{ description }}</p>{% endif %}
+    <div class="guide-actions">
+      <a class="btn ghost" href="#sources">查看 {{ sources|length }} 项来源</a>
+      {% if request.state.user.role != "observer" %}
+      <a class="btn ghost" href="/contribute?{% if course %}course_slug={{ course.slug }}{% else %}topic_slug={{ topic.slug }}{% endif %}">补充这份指南</a>
+      {% else %}<span class="read-only-note">只读参观模式</span>{% endif %}
+    </div>
+    {% if guide %}
+    <p class="trust-line"><span class="badge {% if guide.version > 0 %}approved{% else %}pending{% endif %}">{% if guide.version > 0 %}已发布{% else %}待生成{% endif %}</span>
+      {{ sources|length }} 项来源 · {{ guide.known_gaps|length }} 项已知缺口
+      {% if request.state.user.role == "admin" %}· <a href="/admin/guides/{{ guide.slug }}/edit">编辑</a>{% endif %}
+    </p>
+    {% endif %}
+  </header>
+
+  {% if description and course %}<p class="doc-description">{{ description }}</p>{% endif %}
+  <details class="guide-toc">
+    <summary>目录</summary>
+    <ol><li><a href="#guide-body">学习路径与复习</a></li><li><a href="#sources">资料与来源</a></li><li><a href="#guide-gaps">已知缺口</a></li></ol>
+  </details>
+
+  <section id="guide-body" class="doc guide-body">
+    {% if body_html %}{{ body_html | safe }}{% else %}
+    <p class="hint">本课程还没有正式指南。欢迎补充资料、心得或文章，管理员审核后会生成候选稿。</p>{% endif %}
+  </section>
+
+  <section id="sources" class="guide-section">
+    <h2>资料与来源</h2>
+    <p class="section-intro">正文只展开关键资料。这里保留全部已审核来源，并标明是否已有可用摘要。</p>
+    <div class="source-grid">
+      {% for source in sources %}
+      <article class="source-card" id="source-{{ source.id|replace(':', '-') }}">
+        <div class="source-card-head"><span class="badge">{{ source.material_type }}</span>
+          {% if source.summary_ready %}<span class="source-state">已整理</span>{% else %}<span class="source-state pending">仅原文件</span>{% endif %}</div>
+        <h3>{% if source.url %}<a href="{{ source.url }}" rel="noopener">{{ source.title }}{% if source.file_type %}（{{ source.file_type }}）{% endif %}</a>{% else %}{{ source.title }}{% endif %}</h3>
+        {% if source.filename and source.filename != source.title %}<p class="source-file">{% if source.url %}<a href="{{ source.url }}" rel="noopener">{{ source.filename }}</a>{% else %}{{ source.filename }}{% endif %}</p>{% endif %}
+        <p class="source-meta">{{ source.contributors|join("、") }}{% if source.created_at %} · {{ source.created_at[:10] }}{% endif %}</p>
+        {% if source.reason %}<p class="source-reason">{{ source.reason_html|safe }}{% if source.reason|length > 180 %}…{% endif %}</p>{% endif %}
+      </article>
+      {% else %}<p class="hint">暂时没有已审核来源。</p>{% endfor %}
+    </div>
+  </section>
+
+  <section id="guide-gaps" class="guide-section gap-section">
+    <h2>已知缺口与版本说明</h2>
+    {% if guide and guide.known_gaps %}<ul>{% for gap in guide.known_gaps %}<li>{{ gap }}</li>{% endfor %}</ul>
+    {% else %}<p>暂未记录已知缺口。若发现课程信息或资料不适用，欢迎补充或指出问题。</p>{% endif %}
+    {% if guide and guide.change_summary %}<p class="change-summary"><strong>本版变更：</strong>{{ guide.change_summary }}</p>{% endif %}
+  </section>
+
+  {% if community.features.feedback and guide and request.state.user.role != "observer" %}
+  <div class="doc-footer">
+    <form method="post" action="/feedback/like">
+      <input type="hidden" name="target" value="guide:{{ guide_slug }}">
+      <input type="hidden" name="back" value="{{ request.url.path }}">
+      <button class="like-btn {% if liked %}liked{% endif %}" type="submit">{% if liked %}已赞{% else %}点赞{% endif %} · {{ like_count }}</button>
+    </form>
+  </div>
+  {% endif %}
+</article>
+
+{% if community.features.feedback %}<section class="guide-section comments-section">
+  <h2>留言</h2>
+  {% for comment in feedback.comments %}
+  <div class="comment"><span class="who">{{ display_name(comment.author) }}</span><span class="when">{{ comment.created_at[:16].replace("T", " ") }}</span><div class="body">{{ comment.body }}</div></div>
+  {% else %}<p class="hint">还没有留言。你的收获、疑惑与建议，都是这份指南变得更好的契机。</p>{% endfor %}
+  {% if request.state.user.role != "observer" %}
+  <form method="post" action="/feedback/comment" class="form-card comment-form">
+    <input type="hidden" name="target" value="guide:{{ guide.slug }}"><input type="hidden" name="back" value="{{ request.url.path }}">
+    <label class="field" for="comment_body">补充、纠错或提问</label><textarea id="comment_body" name="body" placeholder="写下你的收获、不解或建议……" required></textarea>
+    <button class="btn" type="submit">留言</button>
+  </form>
+  {% endif %}
+</section>{% endif %}
+{% endblock %}

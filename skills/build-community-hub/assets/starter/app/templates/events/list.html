@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}活动 · {{ community.site.name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>活动</h1>
+  <p class="sub">读书会、讲座与相聚
+    {% if request.state.user.role != "observer" %}· <a href="/events/submit">发起活动</a>{% endif %}
+  </p>
+</div>
+
+<h2 class="divider-title">预告</h2>
+{% for e in upcoming %}
+<div class="card event-card">
+  <div class="event-when">
+    <div class="day">{{ e.start_time[8:10] }}</div>
+    <div class="ym">{{ e.start_time[:7] }}</div>
+    <div class="ym">{{ e.start_time[11:16] }}</div>
+  </div>
+  <div style="flex:1">
+    <h3>{{ e.title }}</h3>
+    <div class="thread-meta">
+      形式：{{ "线上" if e.mode == "online" else "线下" }} ·
+      {% if e.mode == "online" %}会议链接：<a href="{{ e.place }}">{{ e.place }}</a>
+      {% else %}地点：{{ e.place }}{% endif %}
+      {% if e.end_time %} · 至 {{ e.end_time[5:16].replace("T", " ") }}{% endif %}
+      · 发起人：{{ e.organizer_name }}
+    </div>
+    {% if e.description %}<p style="font-size:14px">{{ e.description }}</p>{% endif %}
+    <div class="event-reason">发起理由：{{ e.reason }}</div>
+  </div>
+</div>
+{% else %}
+<p class="hint">暂无预告活动。</p>
+{% endfor %}
+
+<h2 class="divider-title">进行中</h2>
+{% for e in ongoing %}
+<div class="card event-card">
+  <div class="event-when">
+    <div class="day">{{ e.start_time[8:10] }}</div>
+    <div class="ym">{{ e.start_time[:7] }}</div>
+    <div class="ym">{{ e.start_time[11:16] }}</div>
+  </div>
+  <div style="flex:1">
+    <h3>{{ e.title }}</h3>
+    <div class="thread-meta">
+      形式：{{ "线上" if e.mode == "online" else "线下" }} ·
+      {% if e.mode == "online" %}会议链接：<a href="{{ e.place }}">{{ e.place }}</a>
+      {% else %}地点：{{ e.place }}{% endif %}
+      · 至 {{ e.end_time[5:16].replace("T", " ") }} · 发起人：{{ e.organizer_name }}
+    </div>
+    {% if e.description %}<p style="font-size:14px">{{ e.description }}</p>{% endif %}
+    <div class="event-reason">发起理由：{{ e.reason }}</div>
+  </div>
+</div>
+{% else %}<p class="hint">当前没有正在进行的活动。</p>{% endfor %}
+
+{% if past %}
+<h2 class="divider-title">往期</h2>
+{% for e in past %}
+<div class="card">
+  <h3>{{ e.title }}</h3>
+  <div class="thread-meta">{{ e.start_time[:16].replace("T", " ") }} · {{ "线上" if e.mode == "online" else e.place }} · {{ e.organizer_name }}</div>
+</div>
+{% endfor %}
+{% endif %}
+{% endblock %}

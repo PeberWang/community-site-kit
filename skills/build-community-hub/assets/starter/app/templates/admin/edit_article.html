@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}编辑文章 · {{ article.title }}{% endblock %}
+{% block mainclass %}wide{% endblock %}
+{% block content %}
+<p class="back-link"><a href="/admin/articles">← 返回文章管理</a></p>
+<div class="page-head"><p class="eyebrow">内容合规管理</p><h1>编辑文章</h1>
+  <p class="sub">修改会立即更新公开内容；文章记录和原作者信息会保留。</p></div>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<form class="form-card admin-content-form" method="post" action="/admin/articles/{{ article.id }}/edit">
+  <label class="field" for="title">标题</label>
+  <input id="title" type="text" name="title" value="{{ article.title }}" required>
+  <label class="field" for="body">正文（Markdown）</label>
+  <textarea id="body" name="body" class="tall" required>{{ article.body }}</textarea>
+  <button class="btn" type="submit">保存修改</button>
+</form>
+{% endblock %}

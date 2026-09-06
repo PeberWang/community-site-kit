@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}指南 · {{ community.site.name }}{% endblock %}
+{% block mainclass %}wide{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>学习指南</h1>
+  <p class="sub">人生课照亮去处，专业课夯实脚下</p>
+</div>
+
+<h2 class="divider-title">{{ community.labels.open_topics }}</h2>
+{% if topics %}
+<div class="topic-grid">
+  {% for t in topics %}
+  <a class="topic-cell" href="/guides/topic/{{ t.slug }}">
+    <div class="title">{{ t.title }}</div>
+    {% if t.description %}<div class="desc">{{ t.description }}</div>{% endif %}
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<p class="hint">{{ community.labels.open_topics }}正在筹备中，敬请期待。</p>
+{% endif %}
+
+<h2 class="divider-title">{{ community.labels.structured_items }}</h2>
+{% for year, semesters in tree.items() %}
+  {% if semesters %}
+  {% set course_count = semesters.values() | map('length') | sum %}
+  <details class="year-block">
+    <summary class="year-title">
+      {{ year }}<span class="year-count">{{ course_count }} 门课</span>
+    </summary>
+    {% for semester, courses in semesters.items() %}
+      <div class="semester-title">{{ semester }}</div>
+      <div class="course-grid">
+        {% for c in courses %}
+        <a class="course-cell" href="/guides/course/{{ c.slug }}">
+          <div class="name">{{ c.name }}</div>
+          <div class="meta">
+            {{ c.teacher or "老师待补充" }} · {{ c.exam if c.exam in ("闭卷", "开卷", "论文") else "考核待补充" }} · {{ c.course_type }}
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </details>
+  {% endif %}
+{% endfor %}
+{% endblock %}

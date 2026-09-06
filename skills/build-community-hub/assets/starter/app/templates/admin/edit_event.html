@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}编辑活动 · {{ event.title }}{% endblock %}
+{% block mainclass %}wide{% endblock %}
+{% block content %}
+<p class="back-link"><a href="/admin/events">← 返回活动管理</a></p>
+<div class="page-head"><p class="eyebrow">内容合规管理</p><h1>编辑活动</h1>
+  <p class="sub">修改会立即更新公开活动；原发起人和历史记录会保留。</p></div>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+<form class="form-card admin-content-form" method="post" action="/admin/events/{{ event.id }}/edit">
+  <label class="field" for="title">名称</label><input id="title" type="text" name="title" value="{{ event.title }}" required>
+  <label class="field" for="mode">形式</label>
+  <select id="mode" name="mode"><option value="offline" {% if event.mode == "offline" %}selected{% endif %}>线下</option><option value="online" {% if event.mode == "online" %}selected{% endif %}>线上</option></select>
+  <label class="field" for="start_time">开始时间</label><input id="start_time" type="datetime-local" name="start_time" value="{{ event.start_time[:16] }}" required>
+  <label class="field" for="end_time">结束时间 <span class="req">*</span></label><input id="end_time" type="datetime-local" name="end_time" value="{{ event.end_time[:16] }}" required>
+  <label class="field" for="place">地点 / 会议链接</label><input id="place" type="text" name="place" value="{{ event.place }}" required>
+  <label class="field" for="description">详情</label><textarea id="description" name="description">{{ event.description }}</textarea>
+  <label class="field" for="reason">推介理由</label><textarea id="reason" name="reason" required>{{ event.reason }}</textarea>
+  <button class="btn" type="submit">保存修改</button>
+</form>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}{{ thread.title }} · 广场{% endblock %}
+{% block content %}
+<p><a href="/plaza">← 返回广场</a></p>
+<div class="card">
+  <h3>{{ thread.title }}</h3>
+  <div class="thread-meta">{{ display_name(thread.author) }} · {{ thread.created_at[:16].replace("T", " ") }}</div>
+  <p style="white-space:pre-wrap">{{ thread.body }}</p>
+  {% if request.state.user.username == thread.author %}
+  <form method="post" action="/plaza/{{ thread.id }}/delete-own" onsubmit="return confirm('确定删除自己的帖子？')">
+    <button class="btn ghost" type="submit">删除我的帖子</button>
+  </form>
+  {% endif %}
+</div>
+
+<div class="replies">
+  {% for r in thread.replies %}
+    {% if not r.deleted %}
+    <div class="reply">
+      <span class="who" style="color:var(--purple);font-size:13px;font-weight:600">{{ display_name(r.author) }}</span>
+      <span class="thread-meta"> · {{ r.created_at[:16].replace("T", " ") }}</span>
+      <div>{{ r.body }}</div>
+    </div>
+    {% endif %}
+  {% endfor %}
+</div>
+
+{% if request.state.user.role != "observer" %}
+<form method="post" action="/plaza/{{ thread.id }}/reply" class="form-card" style="max-width:none">
+  <textarea name="body" placeholder="回复……" required></textarea>
+  <button class="btn" type="submit">回复</button>
+</form>
+{% endif %}
+{% endblock %}

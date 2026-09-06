@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}账号与邀请码 · {{ community.site.name }}{% endblock %}
+{% block mainclass %}wide{% endblock %}
+{% block content %}
+<div class="page-head"><h1>账号与邀请码</h1></div>
+{% include "admin/_nav.html" %}
+
+<h2 class="divider-title">生成邀请码</h2>
+<form class="form-card" method="post" action="/admin/invites" style="max-width:none">
+  <input type="hidden" name="invite_query" value="{{ invite_query }}">
+  <input type="hidden" name="user_query" value="{{ user_query }}">
+  <div class="account-create">
+    <div><label class="field" for="invite-role">角色</label>
+      <select id="invite-role" name="role">
+        <option value="user">一般用户</option>
+        <option value="admin">管理员</option>
+        <option value="observer">观察员</option>
+      </select></div>
+    <div><label class="field" for="invite-max-uses">可使用次数</label>
+      <input id="invite-max-uses" type="number" name="max_uses" min="1" max="1000" value="1" required></div>
+    <div class="account-note"><label class="field" for="invite-note">备注（给谁用）</label>
+      <input id="invite-note" type="text" name="note" placeholder="如：23级班委 / 学院老师审核"></div>
+    <button class="btn small" type="submit">生成</button>
+  </div>
+</form>
+
+<h2 class="divider-title">邀请码{% if invite_query %}（匹配 {{ invite_total }}{% if invite_limited %}，显示最近 {{ invites | length }}{% endif %}）{% else %}（最近 5 条）{% endif %}</h2>
+<section class="card account-panel">
+  <form class="account-search" method="get" action="/admin/accounts">
+    <input type="hidden" name="user_query" value="{{ user_query }}">
+    <label class="sr-only" for="invite-search">搜索邀请码或备注</label>
+    <input id="invite-search" type="text" name="invite_query" value="{{ invite_query }}"
+           placeholder="搜索邀请码或备注，例如：班委、学院老师">
+    <button class="btn small" type="submit">搜索</button>
+    {% if invite_query %}<a class="btn ghost" href="/admin/accounts?user_query={{ user_query | urlencode }}">清除</a>{% endif %}
+  </form>
+  <div class="account-list">
+    {% for i in invites %}
+    <div class="material">
+      <code style="font-family:var(--mono)">{{ i.code }}</code>
+      <span class="badge">{{ {"admin": "管理员", "user": "用户", "observer": "观察员"}[i.role] }}</span>
+      {% if i.note %}<span class="thread-meta">{{ i.note }}</span>{% endif %}
+      <span class="who">
+        已使用 {{ i.used_count if i.used_count else (1 if i.used_by else 0) }}/{{ i.max_uses }} 次
+        {% if not (i.used_count if i.used_count else i.used_by) %}
+        <form method="post" action="/admin/invites/{{ i.code }}/delete" style="display:inline;margin-left:8px"
+              onsubmit="return confirm('删除该邀请码？')">
+          <input type="hidden" name="invite_query" value="{{ invite_query }}">
+          <input type="hidden" name="user_query" value="{{ user_query }}">
+          <button class="btn ghost" type="submit">删除</button>
+        </form>
+        {% endif %}
+      </span>
+    </div>
+    {% else %}<p class="hint">{% if invite_query %}没有匹配的邀请码。{% else %}还没有邀请码。{% endif %}</p>{% endfor %}
+  </div>
+</section>
+
+<h2 class="divider-title">用户{% if user_query %}（匹配 {{ user_total }}{% if user_limited %}，显示最近 {{ users | length }}{% endif %}）{% else %}（最近 5 位）{% endif %}</h2>
+<section class="card account-panel">
+  <form class="account-search" method="get" action="/admin/accounts">
+    <input type="hidden" name="invite_query" value="{{ invite_query }}">
+    <label class="sr-only" for="user-search">搜索昵称、注册名或角色</label>
+    <input id="user-search" type="text" name="user_query" value="{{ user_query }}"
+           placeholder="搜索昵称、注册名或角色，例如：管理员、观察员">
+    <button class="btn small" type="submit">搜索</button>
+    {% if user_query %}<a class="btn ghost" href="/admin/accounts?invite_query={{ invite_query | urlencode }}">清除</a>{% endif %}
+  </form>
+  <div class="account-list">
+    {% for u in users %}
+    <div class="material">
+      <b>{{ u.display_name }}</b> <span class="thread-meta">@{{ u.username }}</span>
+      <form method="post" action="/admin/users/{{ u.username }}/role" style="display:inline;margin-left:12px">
+        <input type="hidden" name="invite_query" value="{{ invite_query }}">
+        <input type="hidden" name="user_query" value="{{ user_query }}">
+        <select name="role" onchange="this.form.submit()">
+          <option value="admin" {% if u.role == "admin" %}selected{% endif %}>管理员</option>
+          <option value="user" {% if u.role == "user" %}selected{% endif %}>用户</option>
+          <option value="observer" {% if u.role == "observer" %}selected{% endif %}>观察员</option>
+        </select>
+      </form>
+      <span class="who">
+        {{ u.created_at[:10] }} 加入
+        {% if u.username != request.state.user.username %}
+        <form method="post" action="/admin/users/{{ u.username }}/delete" style="display:inline;margin-left:8px"
+              onsubmit="return confirm('删除用户 {{ u.display_name }}？此操作不可恢复')">
+          <input type="hidden" name="invite_query" value="{{ invite_query }}">
+          <input type="hidden" name="user_query" value="{{ user_query }}">
+          <button class="btn ghost" type="submit">删除</button>
+        </form>
+        {% endif %}
+      </span>
+    </div>
+    {% else %}<p class="hint">{% if user_query %}没有匹配的用户。{% else %}还没有用户。{% endif %}</p>{% endfor %}
+  </div>
+</section>
+{% endblock %}

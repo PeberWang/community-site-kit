@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}广场监管 · {{ community.site.name }}{% endblock %}
+{% block mainclass %}wide{% endblock %}
+{% block content %}
+<div class="page-head"><h1>广场管理</h1><p class="sub">自由发布、事后管理：可编辑或下线，原记录保留。</p></div>
+{% include "admin/_nav.html" %}
+{% for t in threads %}
+<div class="card {% if t.deleted %}{% else %}review-item{% endif %}">
+  <div>
+    <b>{{ t.title }}</b>
+    {% if t.deleted %}<span class="badge rejected">已下线</span>{% endif %}
+    <div class="thread-meta">{{ display_name(t.author) }} · {{ t.created_at[:16].replace("T", " ") }}</div>
+  </div>
+  <details style="margin-top:8px">
+    <summary class="hint">编辑 / 查看</summary>
+    <form method="post" action="/admin/plaza/{{ t.id }}/edit" style="margin-top:10px">
+      <input type="text" name="title" value="{{ t.title }}">
+      <textarea name="body" style="margin-top:8px">{{ t.body }}</textarea>
+      <button class="btn small" type="submit">保存修改</button>
+    </form>
+    <div class="replies">
+      {% for r in t.replies %}
+      <div class="reply">
+        <b>{{ display_name(r.author) }}</b>：{{ r.body }}
+        {% if not r.deleted %}
+        <form method="post" action="/admin/plaza/{{ t.id }}/replies/{{ r.id }}/delete" style="display:inline">
+          <button class="btn ghost" type="submit">删回复</button>
+        </form>
+        {% else %}<span class="badge rejected">已下线</span>{% endif %}
+      </div>
+      {% endfor %}
+    </div>
+  </details>
+  {% if not t.deleted %}
+  <form method="post" action="/admin/plaza/{{ t.id }}/delete" style="margin-top:10px"
+        onsubmit="return confirm('确定下线该帖？原记录会保留。')">
+    <button class="btn small seal" type="submit">下线帖子</button>
+  </form>
+  {% endif %}
+</div>
+{% else %}<p class="hint">广场还没有帖子。</p>{% endfor %}
+{% endblock %}

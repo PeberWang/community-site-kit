@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title id="title">共同生长知识站</title>
+  <rect width="128" height="128" rx="28" fill="#355070"/>
+  <path d="M26 35c15 0 28 5 38 15 10-10 23-15 38-15v56c-15 0-28 5-38 15-10-10-23-15-38-15z" fill="#fffaf3"/>
+  <path d="M64 50v56M38 53c9 1 17 4 26 10M90 53c-9 1-17 4-26 10" fill="none" stroke="#b56576" stroke-width="6" stroke-linecap="round"/>
+</svg>

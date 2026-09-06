@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}文章 · {{ community.site.name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>文章</h1>
+  <p class="sub">同学们的原创长文
+    {% if request.state.user.role != "observer" %}· <a href="/articles/submit">投稿</a>{% endif %}
+    · <a href="/articles/mine">我的投稿</a>
+  </p>
+</div>
+{% for a in articles %}
+<div class="card">
+  <h3><a href="/articles/{{ a.id }}">《{{ a.title }}》</a></h3>
+  <div class="thread-meta">
+    {{ display_name(a.author) }} · {{ tags.tag_display(a.course_slug, a.topic_slug) }} · {{ a.published_at[:10] }}
+  </div>
+  {% if a.summary %}<p style="font-size:14px;color:var(--ink-soft)">{{ a.summary }}</p>{% endif %}
+</div>
+{% else %}
+<div class="empty"><p>还没有发表的文章。</p><p>第一篇，<a href="/articles/submit">等你来写</a>。</p></div>
+{% endfor %}
+{% endblock %}

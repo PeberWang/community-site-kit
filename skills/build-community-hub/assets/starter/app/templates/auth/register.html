@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}注册 · {{ community.site.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>注册</h1><p class="sub">凭邀请码加入；邀请码决定你的角色</p></div>
+<form class="form-card" method="post" action="/register">
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+  <label class="field">邀请码 <span class="req">*</span></label>
+  <input type="text" name="invite_code" required>
+  <label class="field">用户名 <span class="req">*</span></label>
+  <input type="text" name="username" required>
+  <label class="field">署名（建议 届别+姓名，如「22级小赵」）</label>
+  <input type="text" name="display_name">
+  <label class="field">密码 <span class="req">*</span></label>
+  <input type="password" name="password" required>
+  <button class="btn" type="submit">注册</button>
+  <p class="hint">已有账号？<a href="/login">登录</a></p>
+</form>
+{% endblock %}

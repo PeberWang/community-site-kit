@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ community.labels.home }} · {{ community.site.name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>最新动态</h1>
+  <p class="sub">{{ community.site.tagline }}</p>
+</div>
+{% for a in announcements %}
+<div class="announce-bar">
+  <span class="feed-label announce">公告</span>
+  <a class="announce-title" data-announce="{{ a.id }}" href="javascript:void(0)">{{ a.title or a.body[:24] }}</a>
+  <span class="feed-meta">{{ a.created_at[:10] }}</span>
+</div>
+<div class="announce-modal" id="announce-{{ a.id }}">
+  <div class="announce-dialog">
+    <div class="announce-dialog-head">
+      <b>{{ a.title }}</b>
+      <button class="announce-close" type="button" aria-label="关闭">×</button>
+    </div>
+    <div class="announce-dialog-body">{{ a.body }}</div>
+    <div class="feed-meta" style="margin-top:14px">{{ a.created_at[:10] }}</div>
+  </div>
+</div>
+{% endfor %}
+{% if announcements %}
+<script>
+document.querySelectorAll("[data-announce]").forEach(function (el) {
+  el.addEventListener("click", function () {
+    document.getElementById("announce-" + el.dataset.announce).classList.add("show");
+  });
+});
+document.querySelectorAll(".announce-modal").forEach(function (m) {
+  m.addEventListener("click", function (e) {
+    if (e.target === m || e.target.classList.contains("announce-close")) {
+      m.classList.remove("show");
+    }
+  });
+});
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape") {
+    document.querySelectorAll(".announce-modal.show").forEach(function (m) {
+      m.classList.remove("show");
+    });
+  }
+});
+</script>
+{% endif %}
+{% if feed %}
+<div class="card">
+  {% for item in feed %}
+  <div class="feed-item">
+    <span class="feed-label {{ item.kind }}">{{ item.label }}</span>
+    <a class="feed-title" href="{{ item.url }}">{{ item.title }}</a>
+    <span class="feed-meta">{{ item.actor }} · {{ item.time[:10] }}</span>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty">
+  <p>还没有新动态。</p>
+  <p>{% if community.features.contributions %}第一份亮点，也许就来自你的<a href="/contribute">贡献</a>。{% else %}内容正在准备中。{% endif %}</p>
+</div>
+{% endif %}
+{% endblock %}

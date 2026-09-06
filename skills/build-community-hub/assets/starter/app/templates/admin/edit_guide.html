@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}编辑指南 · {{ guide.title }}{% endblock %}
+{% block mainclass %}wide{% endblock %}
+{% block content %}
+<div class="page-head">
+  <p class="eyebrow">指南治理</p>
+  <h1>编辑：{{ guide.title }}</h1>
+  <p class="sub">正式版 v{{ guide.version }} · 当前版本已对用户可见；人工保存会成为新版本，AI 只能生成待审核候选稿。</p>
+</div>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+
+{% if course %}
+<h2 class="divider-title">课程信息</h2>
+<form class="form-card course-meta-form" method="post" action="/admin/courses/{{ course.slug }}/meta">
+  <input type="hidden" name="back" value="/admin/guides/{{ guide.slug }}/edit">
+  <div class="form-grid">
+    <div><label class="field" for="teacher">授课老师</label>
+      <input id="teacher" type="text" name="teacher" value="{{ course.teacher }}" placeholder="待补充"></div>
+    <div><label class="field" for="exam">考核方式</label>
+      <select id="exam" name="exam">
+        {% for e in exam_types %}<option value="{{ e }}" {% if course.exam == e %}selected{% endif %}>{{ e if e != "其他" else "其他（暂不确定）" }}</option>{% endfor %}
+      </select></div>
+    <div><label class="field" for="course_type">课程类型</label>
+      <select id="course_type" name="course_type">
+        {% for t in course_types %}<option value="{{ t }}" {% if course.course_type == t %}selected{% endif %}>{{ t }}</option>{% endfor %}
+      </select></div>
+  </div>
+  <button class="btn" type="submit">保存课程信息</button>
+</form>
+{% endif %}
+
+<h2 class="divider-title">正式指南</h2>
+<form method="post" action="/admin/guides/{{ guide.slug }}/edit" class="guide-edit-form">
+  <input type="hidden" name="base_body_sha256" value="{{ guide.body_sha256 }}">
+  <label class="field" for="guide_body">正文</label>
+  <textarea id="guide_body" name="body" class="tall">{{ body }}</textarea>
+  <label class="field" for="change_summary">本次变更说明（可选）</label>
+  <input id="change_summary" type="text" name="change_summary" placeholder="例如：人工补充了期末复习建议">
+  <button class="btn" type="submit">保存为新版本</button>
+</form>
+
+<section class="candidate-actions card">
+  <h3>生成候选稿</h3>
+  <p class="hint">系统会以当前正式版和已审核来源生成草稿，自动检查后仍需你查看差异并发布；历史导入的正式版不需要重复审核。</p>
+  <form method="post" action="/admin/guides/{{ guide.slug }}/evolve"
+        onsubmit="return confirm('生成候选稿不会修改正式指南，是否继续？')">
+    <button class="btn seal" type="submit">生成候选稿</button>
+  </form>
+</section>
+
+{% if candidates %}
+<h2 class="divider-title">候选稿</h2>
+<div class="card candidate-list">
+  {% for candidate in candidates %}
+  <div class="candidate-row">
+    <div>
+      <strong>候选稿 {{ candidate.id[-6:] }}</strong>
+      <span class="badge candidate-{{ candidate.status }}">{{ candidate.status }}</span>
+      <p class="hint">基于正式版 v{{ candidate.base_version }} · {{ candidate.created_at[:16].replace("T", " ") }}</p>
+    </div>
+    <a class="btn ghost" href="/admin/guides/{{ guide.slug }}/candidates/{{ candidate.id }}">查看差异</a>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if compile_jobs %}
+<h2 class="divider-title">自动汇编任务</h2>
+<div class="card candidate-list">
+  {% for job in compile_jobs %}
+  <div class="candidate-row">
+    <div>
+      <strong>任务 {{ job.id[-6:] }}</strong>
+      <span class="badge candidate-{{ job.status }}">{{ {"queued": "等待合并", "running": "正在生成", "completed": "已完成", "failed": "需要处理"}[job.status] }}</span>
+      <p class="hint">涉及 {{ job.contribution_ids|length }} 份已通过贡献 · {{ job.requested_at[:16].replace("T", " ") }}</p>
+      {% if job.status == "failed" %}<p class="error">候选稿未生成：{{ job.error or "请手动生成候选稿或稍后重试。" }}</p>{% endif %}
+    </div>
+    {% if job.candidate_id %}<a class="btn ghost" href="/admin/guides/{{ guide.slug }}/candidates/{{ job.candidate_id }}">查看候选稿</a>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% if history %}
+<h2 class="divider-title">历史版本</h2>
+<div class="card history-list">
+  {% for history_name in history %}
+  <div class="history-row">
+    <code>{{ history_name }}</code>
+    <form method="post" action="/admin/guides/{{ guide.slug }}/history/{{ history_name }}/restore"
+          onsubmit="return confirm('恢复会创建一个新的正式版本，确定继续？')">
+      <button class="btn ghost" type="submit">恢复为新版本</button>
+    </form>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

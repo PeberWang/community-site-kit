@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}贡献 · {{ community.site.name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>贡献</h1>
+  <p class="sub">一份心得、一份资料，都是传给后来者的火种 · <a href="/contribute/mine">我的贡献</a></p>
+</div>
+<form class="form-card" method="post" action="/contribute" enctype="multipart/form-data">
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+
+  <label class="field">归属 <span class="req">*</span>（这份贡献属于哪门课）</label>
+  <input type="text" id="tag_search" list="tag_options"
+         placeholder="输入名字即刻匹配"
+         autocomplete="off" value="{{ preset_label|default('') }}">
+  <datalist id="tag_options">
+    {% for t in topics %}
+    <option value="{{ t.title }}" data-code="topic:{{ t.slug }}">
+      {{ t.description }}</option>
+    {% endfor %}
+    {% for c in courses %}
+    <option value="{{ c.name }}（{{ c.semester }}）" data-code="course:{{ c.slug }}"></option>
+    {% endfor %}
+    <option value="＋ 创建新的课程/主题" data-code="new"></option>
+  </datalist>
+  <input type="hidden" name="tag_choice" id="tag_choice" value="{{ preset_choice|default('') }}">
+  <div id="new_tag_wrap" style="display:none">
+    <label class="field">新课程/主题名称 <span class="req">*</span></label>
+    <input type="text" name="new_tag_name" placeholder="如「政治经济学经典导读」">
+  </div>
+
+  <label class="field">心得 / 推荐理由（与附件至少填一项）</label>
+  <textarea name="text" placeholder="为什么推荐？怎么用最有效？给学弟学妹的话……"></textarea>
+
+  <label class="field">附件（可以一次上传多份文件）</label>
+  <input type="file" name="files" multiple>
+  <label class="field">资料类型</label>
+  <select name="material_type">
+    <option>笔记</option><option>PPT</option><option>真题</option>
+    <option>教材</option><option>阅读材料</option><option>复习大纲</option>
+    <option>练习题</option><option selected>其他</option>
+  </select>
+
+  <button class="btn" type="submit">提交审核</button>
+  <p class="hint">审核通过后，你的贡献将汇入对应课程的学习指南。</p>
+</form>
+<script>
+(function () {
+  var input = document.getElementById("tag_search");
+  var hidden = document.getElementById("tag_choice");
+  var wrap = document.getElementById("new_tag_wrap");
+  var options = document.querySelectorAll("#tag_options option");
+  function sync() {
+    var v = input.value, code = "";
+    options.forEach(function (o) { if (o.value === v) code = o.dataset.code; });
+    hidden.value = code;
+    wrap.style.display = code === "new" ? "block" : "none";
+  }
+  input.addEventListener("input", sync);
+  input.addEventListener("change", sync);
+})();
+</script>
+{% endblock %}

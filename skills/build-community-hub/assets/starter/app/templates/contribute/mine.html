@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}我的贡献 · {{ community.site.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>我的贡献</h1><p class="sub"><a href="/contribute">再贡献一份</a></p></div>
+{% if submitted %}<p class="badge approved">已提交，等待审核</p>{% endif %}
+{% for c in contributions %}
+<div class="card">
+  <div>
+    <span class="badge {{ c.review_status }}">{{ {"pending": "待审核", "approved": "已通过", "rejected": "未通过"}[c.review_status] }}</span>
+    <b style="margin-left:8px">{{ tags.tag_display(c.course_slug, c.topic_slug) if not c.new_tag_name else "新 tag：" + c.new_tag_name }}</b>
+    <span class="thread-meta"> · {{ c.created_at[:10] }}</span>
+  </div>
+  {% if c.review_status == "approved" %}
+  <p class="guide-progress">
+    {% if c.guide_state == "queued" %}
+      已通过审核，正在合并同课程的新贡献并准备候选稿。
+    {% elif c.guide_state == "candidate_ready" %}
+      已纳入待管理员审核的指南候选稿。
+    {% elif c.guide_state == "published" %}
+      {% set tag = tags.get_course(c.course_slug) if c.course_slug else tags.get_topic(c.topic_slug) %}
+      已纳入指南 v{{ c.guide_published_version }}。
+      {% if tag %}<a href="/guides/{{ 'course' if c.course_slug else 'topic' }}/{{ tag.slug }}">查看这份指南</a>{% endif %}
+    {% else %}
+      已通过审核，等待纳入下一次指南汇编。
+    {% endif %}
+  </p>
+  {% endif %}
+  {% if c.text %}<p style="font-size:14px;margin:8px 0 0">{{ c.text }}</p>{% endif %}
+  {% for a in c.attachments %}
+  <div class="material"><span class="mtype">{{ a.material_type }}</span>{{ a.filename }}</div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="empty"><p>还没有贡献。<a href="/contribute">来第一份</a></p></div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}广场 · {{ community.site.name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>广场</h1>
+  <p class="sub">自由发声，彼此照拂</p>
+</div>
+
+{% if request.state.user.role != "observer" %}
+<form class="form-card" method="post" action="/plaza/post" style="max-width:none">
+  <label class="field">发起话题</label>
+  <input type="text" name="title" placeholder="标题" required>
+  <textarea name="body" placeholder="想说的话……" required style="margin-top:8px"></textarea>
+  <button class="btn" type="submit">发布</button>
+</form>
+{% endif %}
+
+{% for t in threads %}
+<div class="card thread-card" data-tid="{{ t.id }}" style="cursor:pointer">
+  <div class="thread-title">{{ t.title }}</div>
+  <div class="thread-meta">
+    {{ display_name(t.author) }} · {{ t.created_at[:16].replace("T", " ") }} · {{ t.replies | selectattr("deleted", "equalto", false) | list | length }} 回复
+  </div>
+</div>
+{% else %}
+<div class="empty"><p>广场还很安静。来说点什么吧。</p></div>
+{% endfor %}
+
+<div class="modal" id="thread-modal">
+  <div class="modal-card">
+    <button class="modal-close" id="modal-close" aria-label="关闭">×</button>
+    <div id="modal-body">加载中……</div>
+  </div>
+</div>
+<script>
+(function () {
+  var modal = document.getElementById("thread-modal");
+  var body = document.getElementById("modal-body");
+  document.querySelectorAll(".thread-card").forEach(function (card) {
+    card.addEventListener("click", function () {
+      body.innerHTML = "加载中……";
+      modal.classList.add("open");
+      fetch("/plaza/" + card.dataset.tid + "/fragment")
+        .then(function (r) { return r.text(); })
+        .then(function (html) { body.innerHTML = html; });
+    });
+  });
+  document.getElementById("modal-close").addEventListener("click", function () {
+    modal.classList.remove("open");
+  });
+  modal.addEventListener("click", function (e) {
+    if (e.target === modal) modal.classList.remove("open");
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") modal.classList.remove("open");
+  });
+})();
+</script>
+{% endblock %}

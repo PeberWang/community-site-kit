@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}审核队列 · {{ community.site.name }}{% endblock %}
+{% block mainclass %}wide{% endblock %}
+{% block content %}
+<div class="page-head"><h1>审核队列</h1>
+  <p class="sub">审核贡献、文章与指南候选稿。公告、活动和已发布内容请在上方对应入口管理。</p></div>
+{% include "admin/_nav.html" %}
+
+<h2 class="divider-title">待发布指南候选稿（{{ candidate_reviews | length }}）</h2>
+<p class="hint">已通过的贡献会先进入汇编任务；生成候选稿后，必须在这里查看差异并手动发布，才会更新公开指南。</p>
+{% for item in candidate_reviews %}
+{% set candidate = item.candidate %}{% set guide = item.guide %}
+<div class="card review-item">
+  <h3>{{ guide.title }}</h3>
+  <div class="thread-meta">正式版 v{{ guide.version }} · 候选稿生成于 {{ candidate.created_at[:16].replace("T", " ") }} · {{ candidate.contribution_ids | length }} 份贡献、{{ candidate.source_ids | length }} 项来源</div>
+  {% if candidate.change_summary %}<p style="font-size:14px;margin:8px 0">{{ candidate.change_summary }}</p>{% endif %}
+  {% if candidate.validation_errors %}<p class="error">自动检查发现 {{ candidate.validation_errors | length }} 个阻断问题，请先处理。</p>{% else %}<p class="validation pass">自动检查通过，等待人工判断。</p>{% endif %}
+  <a class="btn small" href="/admin/guides/{{ guide.slug }}/candidates/{{ candidate.id }}">查看差异并决定发布</a>
+</div>
+{% else %}<p class="hint">目前没有待发布候选稿。通过贡献后，系统会在汇编完成时将候选稿放到这里。</p>{% endfor %}
+
+<h2 class="divider-title">待审贡献（{{ pending_contributions | length }}）</h2>
+{% for c in pending_contributions %}
+<div class="card review-item">
+  <div>
+    <b>{{ display_name(c.contributor) }}</b>
+    <span class="thread-meta"> · {{ c.created_at[:16].replace("T", " ") }} ·
+      {% if c.new_tag_name %}提议新 tag：<b>{{ c.new_tag_name }}</b>
+      {% else %}{{ tags.tag_display(c.course_slug, c.topic_slug) }}{% endif %}
+    </span>
+  </div>
+  {% if c.text %}<p style="font-size:14px;margin:8px 0">{{ c.text }}</p>{% endif %}
+  {% for a in c.attachments %}
+  <div class="material"><span class="mtype">{{ a.material_type }}</span>{{ a.filename }}（{{ (a.size / 1024) | int }} KB）</div>
+  {% endfor %}
+  <form class="review-actions" method="post" action="/admin/contributions/{{ c.id }}/review">
+    <select name="tag_choice" style="max-width:320px">
+      <option value="">保持原 tag</option>
+      <optgroup label="人生课">
+        {% for t in tags.list_topics() %}<option value="topic:{{ t.slug }}">人生课 · {{ t.title }}</option>{% endfor %}
+      </optgroup>
+      <optgroup label="专业课">
+        {% for co in tags.courses.all() %}<option value="course:{{ co.slug }}">专业课 · {{ co.name }}</option>{% endfor %}
+      </optgroup>
+    </select>
+    <button class="btn small" name="action" value="approve" type="submit">通过并进入指南汇编</button>
+    <button class="btn small seal" name="action" value="reject" type="submit">拒绝</button>
+  </form>
+</div>
+{% else %}<p class="hint">没有待审贡献。</p>{% endfor %}
+
+<h2 class="divider-title">待审文章（{{ pending_articles | length }}）</h2>
+{% for a in pending_articles %}
+<div class="card review-item">
+  <h3>《{{ a.title }}》</h3>
+  <div class="thread-meta">{{ display_name(a.author) }} · {{ tags.tag_display(a.course_slug, a.topic_slug) }} · {{ a.created_at[:10] }}</div>
+  <details style="margin-top:8px"><summary class="hint">预览正文</summary>
+    <div style="white-space:pre-wrap;font-size:14px;margin-top:8px">{{ a.body[:2000] }}</div>
+  </details>
+  <form class="review-actions" method="post" action="/admin/articles/{{ a.id }}/review">
+    <button class="btn small" name="action" value="approve" type="submit">发表</button>
+    <button class="btn small seal" name="action" value="reject" type="submit">拒绝</button>
+  </form>
+</div>
+{% else %}<p class="hint">没有待审文章。</p>{% endfor %}
+{% endblock %}

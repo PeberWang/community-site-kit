@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}我的投稿 · {{ community.site.name }}{% endblock %}
+{% block content %}
+<div class="page-head"><h1>我的投稿</h1></div>
+{% if submitted %}<p class="badge approved">已提交，等待审核</p>{% endif %}
+{% for a in articles %}
+<div class="card">
+  <h3>{% if a.review_status == "approved" %}<a href="/articles/{{ a.id }}">《{{ a.title }}》</a>{% else %}《{{ a.title }}》{% endif %}</h3>
+  <span class="badge {{ a.review_status }}">{{ {"pending": "待审核", "approved": "已发表", "rejected": "未通过"}[a.review_status] }}</span>
+  <span class="thread-meta"> · {{ a.created_at[:10] }}</span>
+</div>
+{% else %}
+<div class="empty"><p>还没有投稿。<a href="/articles/submit">写第一篇</a></p></div>
+{% endfor %}
+{% endblock %}

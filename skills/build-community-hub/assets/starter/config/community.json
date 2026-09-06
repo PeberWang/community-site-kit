@@ -1,0 +1,35 @@
+{
+  "site": {
+    "name": "共同生长知识站",
+    "short_name": "共同生长",
+    "community_name": "示例社群",
+    "tagline": "把散落的经验，变成共同维护的知识",
+    "description": "一个由成员贡献、人工治理、持续演化的社区知识网站。",
+    "system_name": "社区助手",
+    "locale": "zh-CN"
+  },
+  "features": {
+    "home": true,
+    "guides": true,
+    "articles": true,
+    "events": true,
+    "plaza": false,
+    "contributions": true,
+    "feedback": true
+  },
+  "labels": {
+    "home": "首页",
+    "guides": "指南",
+    "articles": "文章",
+    "events": "活动",
+    "plaza": "广场",
+    "contributions": "贡献",
+    "admin": "审核",
+    "structured_items": "专业内容",
+    "open_topics": "成长主题"
+  },
+  "theme": {
+    "primary": "#355070",
+    "accent": "#b56576"
+  }
+}

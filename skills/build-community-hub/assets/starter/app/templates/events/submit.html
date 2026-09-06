@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}发起活动 · {{ community.site.name }}{% endblock %}
+{% block content %}
+<div class="page-head">
+  <h1>发起活动</h1>
+  <p class="sub">线上填会议链接，线下填具体地点；审核通过后发布</p>
+</div>
+<form class="form-card" method="post" action="/events/submit">
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+  <label class="field">活动名称 <span class="req">*</span></label>
+  <input type="text" name="title" required>
+  <label class="field">形式 <span class="req">*</span></label>
+  <select name="mode">
+    <option value="offline">线下</option>
+    <option value="online">线上</option>
+  </select>
+  <label class="field">开始时间 <span class="req">*</span></label>
+  <input type="datetime-local" name="start_time" required>
+  <label class="field">结束时间 <span class="req">*</span></label>
+  <input type="datetime-local" name="end_time" required>
+  <label class="field">地点 / 会议链接 <span class="req">*</span></label>
+  <input type="text" name="place" placeholder="线下填具体地点；线上填腾讯会议等链接" required>
+  <label class="field">活动详情</label>
+  <textarea name="description" placeholder="议程、面向人群、需要准备什么……"></textarea>
+  <label class="field">发起/推介理由 <span class="req">*</span>（原汁原味地说说：为什么发起/推荐这个活动）</label>
+  <textarea name="reason" required></textarea>
+  <button class="btn" type="submit">提交审核</button>
+</form>
+{% endblock %}

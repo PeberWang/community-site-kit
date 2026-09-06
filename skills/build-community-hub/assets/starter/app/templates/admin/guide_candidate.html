@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}审核候选稿 · {{ guide.title }}{% endblock %}
+{% block mainclass %}wide{% endblock %}
+{% block content %}
+<p><a href="/admin/guides/{{ guide.slug }}/edit">← 返回指南编辑</a></p>
+<div class="page-head">
+  <p class="eyebrow">候选稿审核</p>
+  <h1>{{ guide.title }}</h1>
+  <p class="sub">正式版 v{{ guide.version }} → 候选稿 · {{ candidate.created_at[:16].replace("T", " ") }}</p>
+</div>
+{% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+
+<section class="candidate-summary card">
+  <div><span class="badge candidate-{{ candidate.status }}">{{ candidate.status }}</span>
+    <strong>本次输入 {{ candidate.source_ids|length }} 项来源、{{ candidate.contribution_ids|length }} 份贡献</strong></div>
+  <p class="hint">{{ candidate.change_summary }}</p>
+  {% if candidate.validation_errors %}
+  <div class="validation errors"><strong>阻断发布的问题</strong><ul>{% for item in candidate.validation_errors %}<li>{{ item }}</li>{% endfor %}</ul></div>
+  {% else %}<p class="validation pass">自动检查通过，可以进入人工判断。</p>{% endif %}
+  {% if candidate.validation_warnings %}
+  <div class="validation warnings"><strong>需要关注</strong><ul>{% for item in candidate.validation_warnings %}<li>{{ item }}</li>{% endfor %}</ul></div>
+  {% endif %}
+</section>
+
+<h2 class="divider-title">与正式版的差异</h2>
+<div class="diff-card" aria-label="候选稿差异">
+  {% for row in diff_rows %}
+  <div class="diff-row {{ row.kind }}"><span aria-hidden="true">{% if row.kind == "added" %}+{% elif row.kind == "removed" %}−{% else %}·{% endif %}</span><code>{{ row.text }}</code></div>
+  {% else %}<p class="hint">候选稿与正式版没有文字差异。</p>{% endfor %}
+</div>
+
+{% if candidate.status == "ready" %}
+<div class="candidate-toolbar">
+  <form method="post" action="/admin/guides/{{ guide.slug }}/candidates/{{ candidate.id }}/publish"
+        onsubmit="return confirm('发布后读者会看到新版本，确定发布？')">
+    <button class="btn" type="submit" {% if candidate.validation_errors %}disabled{% endif %}>发布为 v{{ guide.version + 1 }}</button>
+  </form>
+  <form method="post" action="/admin/guides/{{ guide.slug }}/candidates/{{ candidate.id }}/discard"
+        onsubmit="return confirm('确定舍弃这份候选稿？')">
+    <button class="btn ghost" type="submit">舍弃候选稿</button>
+  </form>
+</div>
+
+<details class="candidate-editor">
+  <summary>编辑候选稿后重新检查</summary>
+  <form method="post" action="/admin/guides/{{ guide.slug }}/candidates/{{ candidate.id }}/edit">
+    <label class="field" for="candidate_body">候选正文</label>
+    <textarea id="candidate_body" name="body" class="tall">{{ body }}</textarea>
+    <button class="btn seal" type="submit">保存并重新检查</button>
+  </form>
+</details>
+{% endif %}
+{% endblock %}

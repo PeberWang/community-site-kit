@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ article.title }} · {{ community.site.name }}{% endblock %}
+{% block content %}
+<p><a href="/articles">← 返回文章</a></p>
+<div class="doc">
+  <div class="doc-meta">
+    《{{ article.title }}》 · {{ display_name(article.author) }} · {{ tag_display }} · {{ article.published_at[:10] }}
+  </div>
+  {{ body_html | safe }}
+  {% if community.features.feedback %}<div class="doc-footer">
+    <form method="post" action="/feedback/like">
+      <input type="hidden" name="target" value="article:{{ article.id }}">
+      <input type="hidden" name="back" value="{{ request.url.path }}">
+      <button class="like-btn {% if liked %}liked{% endif %}" type="submit">
+        {% if liked %}已赞{% else %}点赞{% endif %} · {{ like_count }}
+      </button>
+    </form>
+  </div>{% endif %}
+</div>
+
+{% if community.features.feedback %}<h2 class="divider-title">留言</h2>
+{% for c in feedback.comments %}
+<div class="comment">
+  <span class="who">{{ display_name(c.author) }}</span><span class="when">{{ c.created_at[:16].replace("T", " ") }}</span>
+  <div class="body">{{ c.body }}</div>
+</div>
+{% else %}
+<p class="hint">还没有留言。</p>
+{% endfor %}
+{% if request.state.user.role != "observer" %}
+<form method="post" action="/feedback/comment" class="form-card" style="max-width:none">
+  <input type="hidden" name="target" value="article:{{ article.id }}">
+  <input type="hidden" name="back" value="{{ request.url.path }}">
+  <textarea name="body" placeholder="写下你的想法……" required></textarea>
+  <button class="btn" type="submit">留言</button>
+</form>
+{% endif %}
+{% endif %}
+{% endblock %}

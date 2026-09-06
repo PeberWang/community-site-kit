@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}公告管理 · {{ community.site.name }}{% endblock %}
+{% block mainclass %}wide{% endblock %}
+{% block content %}
+<div class="page-head"><h1>公告管理</h1><p class="sub">直接发布、编辑或下线首页公告；下线只隐藏，不删除记录。</p></div>
+{% include "admin/_nav.html" %}
+
+<h2 class="divider-title">发布公告</h2>
+<form class="form-card" method="post" action="/admin/announcements" style="max-width:none">
+  <label class="field" for="announcement-title">公告标题（首页公告栏只显示标题）</label>
+  <input id="announcement-title" type="text" name="title" placeholder="例如：大礼包正式上线" required>
+  <label class="field" for="announcement-body">公告内容（用户点击标题后，在浮窗中查看）</label>
+  <textarea id="announcement-body" name="body" placeholder="公告全文……" required></textarea>
+  <button class="btn" type="submit">发布公告</button>
+</form>
+
+<h2 class="divider-title">已上线与已下线公告{% if announcement_query %}（匹配 {{ announcement_total }}{% if announcement_limited %}，显示最近 {{ announcements | length }}{% endif %}）{% else %}（最近 5 条）{% endif %}</h2>
+<section class="card account-panel">
+  <form class="account-search" method="get" action="/admin/announcements">
+    <label class="sr-only" for="announcement-search">搜索公告标题</label>
+    <input id="announcement-search" type="text" name="query" value="{{ announcement_query }}" placeholder="搜索公告标题">
+    <button class="btn small" type="submit">搜索</button>
+    {% if announcement_query %}<a class="btn ghost" href="/admin/announcements">清除</a>{% endif %}
+  </form>
+  <details class="collapse-block"{% if announcement_query %} open{% endif %}>
+    <summary class="collapse-summary">{% if announcement_query %}展开匹配的公告{% else %}展开最近 5 条公告{% endif %}</summary>
+    <div class="account-list">
+      {% for a in announcements %}
+      <div class="card review-item {% if a.deleted %}content-withdrawn{% endif %}">
+        <b>{{ a.title or "（早期公告，无标题）" }}</b>
+        <span class="badge {% if a.deleted %}rejected{% endif %}">{{ "已下线" if a.deleted else "已上线" }}</span>
+        <p style="font-size:14px;margin:6px 0">{{ a.body }}</p>
+        <div class="thread-meta">{{ display_name(a.created_by) }} · {{ a.created_at[:16].replace("T", " ") }}</div>
+        {% if not a.deleted %}<details class="admin-inline-edit"><summary>编辑公告</summary>
+          <form method="post" action="/admin/announcements/{{ a.id }}/edit">
+            <label class="field">标题</label><input type="text" name="title" value="{{ a.title }}" required>
+            <label class="field">内容</label><textarea name="body" required>{{ a.body }}</textarea>
+            <button class="btn small" type="submit">保存修改</button>
+          </form>
+        </details>
+        <form class="review-actions" method="post" action="/admin/announcements/{{ a.id }}/delete" onsubmit="return confirm('确定下线该公告？原记录会保留。')">
+          <button class="btn small seal" type="submit">下线</button>
+        </form>{% else %}<form class="review-actions" method="post" action="/admin/announcements/{{ a.id }}/restore">
+          <button class="btn small" type="submit">恢复上线</button>
+        </form>{% endif %}
+      </div>
+      {% else %}<p class="hint">{% if announcement_query %}没有匹配的公告。{% else %}还没有公告。{% endif %}</p>{% endfor %}
+    </div>
+  </details>
+</section>
+{% endblock %}

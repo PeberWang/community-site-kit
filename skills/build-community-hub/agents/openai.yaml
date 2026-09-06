@@ -1,0 +1,4 @@
+interface:
+  display_name: "共建社区网站"
+  short_description: "和 Agent 对话，设计并搭建可治理的社区知识网站"
+  default_prompt: "使用 $build-community-hub 和我逐步讨论需求，并搭建适合我的专业或社群的网站。"

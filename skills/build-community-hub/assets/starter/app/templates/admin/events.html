@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}活动管理 · {{ community.site.name }}{% endblock %}
+{% block mainclass %}wide{% endblock %}
+{% block content %}
+<div class="page-head"><h1>活动管理</h1><p class="sub">先直接发布或处理待审活动；已上线活动可随时编辑、下线或恢复。</p></div>
+{% include "admin/_nav.html" %}
+
+<h2 class="divider-title">直接发布活动（讲座等）</h2>
+<form class="form-card" method="post" action="/admin/events/publish" style="max-width:none">
+  <div class="event-publish-grid">
+    <div><label class="field">名称</label><input type="text" name="title" required></div>
+    <div><label class="field">形式</label><select name="mode"><option value="offline">线下</option><option value="online">线上</option></select></div>
+    <div><label class="field">开始时间</label><input type="datetime-local" name="start_time" required></div>
+    <div><label class="field">结束时间 <span class="req">*</span></label><input type="datetime-local" name="end_time" required></div>
+  </div>
+  <label class="field">地点 / 会议链接</label><input type="text" name="place" required>
+  <label class="field">详情</label><textarea name="description"></textarea>
+  <label class="field">推介理由</label><textarea name="reason" required></textarea>
+  <button class="btn" type="submit">直接发布</button>
+</form>
+
+<h2 class="divider-title">待审活动（{{ pending_events | length }}）</h2>
+{% for e in pending_events %}
+<div class="card review-item">
+  <h3>{{ e.title }} <span class="badge {{ 'online' if e.mode == 'online' else '' }}">{{ "线上" if e.mode == "online" else "线下" }}</span></h3>
+  <div class="thread-meta">{{ e.start_time[:16].replace("T", " ") }} 至 {{ e.end_time[:16].replace("T", " ") }} · {{ e.place }} · {{ display_name(e.organizer) }}</div>
+  {% if e.description %}<p style="font-size:14px">{{ e.description }}</p>{% endif %}
+  <div class="event-reason">发起理由：{{ e.reason }}</div>
+  <form class="review-actions" method="post" action="/admin/events/{{ e.id }}/review">
+    <button class="btn small" name="action" value="approve" type="submit">发布</button>
+    <button class="btn small seal" name="action" value="reject" type="submit">拒绝</button>
+  </form>
+</div>
+{% else %}<p class="hint">没有待审活动。</p>{% endfor %}
+
+<h2 class="divider-title">已发布活动管理</h2>
+{% for e in managed_events %}
+<div class="card review-item {% if e.withdrawn %}content-withdrawn{% endif %}">
+  <h3>{{ e.title }} <span class="badge {{ 'online' if e.mode == 'online' else '' }}">{{ "线上" if e.mode == "online" else "线下" }}</span> {% if e.withdrawn %}<span class="badge rejected">已下线</span>{% endif %}</h3>
+  <div class="thread-meta">{{ e.start_time[:16].replace("T", " ") }} 至 {{ e.end_time[:16].replace("T", " ") }} · {{ e.place }} · {{ display_name(e.organizer) }}</div>
+  <div class="review-actions">
+    <a class="btn small ghost" href="/admin/events/{{ e.id }}/edit">编辑</a>
+    {% if e.withdrawn %}<form method="post" action="/admin/events/{{ e.id }}/restore"><button class="btn small" type="submit">恢复上线</button></form>
+    {% else %}<form method="post" action="/admin/events/{{ e.id }}/withdraw" onsubmit="return confirm('确定下线这个活动？原记录不会删除。')"><button class="btn small seal" type="submit">下线</button></form>{% endif %}
+  </div>
+</div>
+{% else %}<p class="hint">暂无已发布活动。</p>{% endfor %}
+{% endblock %}

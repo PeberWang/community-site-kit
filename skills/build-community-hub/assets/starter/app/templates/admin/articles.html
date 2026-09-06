@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}文章管理 · {{ community.site.name }}{% endblock %}
+{% block mainclass %}wide{% endblock %}
+{% block content %}
+<div class="page-head"><h1>文章管理</h1><p class="sub">已发布文章归网站管理；可编辑、下线或恢复，原作者和记录保留。</p></div>
+{% include "admin/_nav.html" %}
+
+<h2 class="divider-title">已发布文章{% if article_query %}（匹配 {{ article_total }}{% if article_limited %}，显示最近 {{ articles | length }}{% endif %}）{% else %}（最近 5 条）{% endif %}</h2>
+<section class="card account-panel">
+  <form class="account-search" method="get" action="/admin/articles">
+    <label class="sr-only" for="article-search">搜索文章标题</label>
+    <input id="article-search" type="text" name="query" value="{{ article_query }}" placeholder="搜索文章标题">
+    <button class="btn small" type="submit">搜索</button>
+    {% if article_query %}<a class="btn ghost" href="/admin/articles">清除</a>{% endif %}
+  </form>
+  <div class="account-list">
+    {% for a in articles %}
+    <div class="card review-item {% if a.withdrawn %}content-withdrawn{% endif %}">
+      <h3>《{{ a.title }}》 {% if a.withdrawn %}<span class="badge rejected">已下线</span>{% else %}<span class="badge">已上线</span>{% endif %}</h3>
+      <div class="thread-meta">{{ display_name(a.author) }} · {{ a.published_at[:10] }}</div>
+      <div class="review-actions">
+        <a class="btn small ghost" href="/admin/articles/{{ a.id }}/edit">编辑</a>
+        {% if a.withdrawn %}<form method="post" action="/admin/articles/{{ a.id }}/restore"><button class="btn small" type="submit">恢复上线</button></form>
+        {% else %}<form method="post" action="/admin/articles/{{ a.id }}/withdraw" onsubmit="return confirm('确定下线这篇文章？原记录不会删除。')"><button class="btn small seal" type="submit">下线</button></form>{% endif %}
+      </div>
+    </div>
+    {% else %}<p class="hint">{% if article_query %}没有匹配的文章。{% else %}暂无已发布文章。{% endif %}</p>{% endfor %}
+  </div>
+</section>
+{% endblock %}

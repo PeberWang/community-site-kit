@@ -1,0 +1,22 @@
+<h3 style="margin-top:0;color:var(--purple)">{{ thread.title }}</h3>
+<div class="thread-meta">{{ display_name(thread.author) }} · {{ thread.created_at[:16].replace("T", " ") }}</div>
+<p style="white-space:pre-wrap;margin:14px 0">{{ thread.body }}</p>
+<div class="replies">
+  {% for r in thread.replies %}
+    {% if not r.deleted %}
+    <div class="reply">
+      <span style="color:var(--purple);font-size:13px;font-weight:600">{{ display_name(r.author) }}</span>
+      <span class="thread-meta"> · {{ r.created_at[:16].replace("T", " ") }}</span>
+      <div>{{ r.body }}</div>
+    </div>
+    {% endif %}
+  {% endfor %}
+</div>
+{% if request.state.user.role != "observer" %}
+<form method="post" action="/plaza/{{ thread.id }}/reply">
+  <div style="display:flex;gap:8px">
+    <input type="text" name="body" placeholder="回复……" required style="flex:1">
+    <button class="btn small" type="submit">回复</button>
+  </div>
+</form>
+{% endif %}

@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}课程与主题 · {{ community.site.name }}{% endblock %}
+{% block mainclass %}wide{% endblock %}
+{% block content %}
+<div class="page-head"><h1>课程与主题</h1></div>
+{% include "admin/_nav.html" %}
+
+<h2 class="divider-title">新增人生课</h2>
+<form class="form-card" method="post" action="/admin/topics" style="max-width:none">
+  <div style="display:flex;gap:12px;align-items:flex-end">
+    <div><label class="field">课程名</label><input type="text" name="title" required></div>
+    <div style="flex:1"><label class="field">简介（这门课的定位与面向，会融入 LLM 综述的生成）</label><input type="text" name="description"></div>
+    <button class="btn small" type="submit">添加</button>
+  </div>
+</form>
+<div class="card">
+  {% for t in topics %}
+  <div class="material">
+    <b>{{ t.title }}</b> <span class="thread-meta">{{ t.description }}</span>
+    <span class="who"><a href="/admin/guides/{{ t.guide_slug }}/edit">编辑指南</a></span>
+  </div>
+  {% else %}<p class="hint">还没有人生课主题。</p>{% endfor %}
+</div>
+
+<h2 class="divider-title">新增专业课</h2>
+<form class="form-card" method="post" action="/admin/courses" style="max-width:none">
+  <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr auto;gap:0 12px;align-items:end">
+    <div><label class="field">课程名</label><input type="text" name="name" required></div>
+    <div><label class="field">学期</label>
+      <select name="semester">
+        {% for s in ["大一上", "大一下", "大二上", "大二下", "大三上", "大三下", "大四上", "大四下"] %}
+        <option>{{ s }}</option>{% endfor %}
+      </select></div>
+    <div><label class="field">老师</label><input type="text" name="teacher"></div>
+    <div><label class="field">类型</label>
+      <select name="course_type"><option>专业必修课</option><option>非专业必修课</option></select></div>
+    <div><label class="field">考核</label>
+      <select name="exam"><option>闭卷</option><option>开卷</option><option>论文</option><option>其他</option></select></div>
+    <button class="btn small" type="submit">添加</button>
+  </div>
+</form>
+
+{% for year, semesters in tree.items() %}
+  {% if semesters %}
+  {% set course_count = semesters.values() | map('length') | sum %}
+  <details class="year-block">
+    <summary class="year-title">{{ year }}<span class="year-count">{{ course_count }} 门课</span></summary>
+    <div class="card">
+      {% for semester, courses in semesters.items() %}
+        {% for c in courses %}
+        <div class="material">
+          <b>{{ c.name }}</b>
+          <span class="thread-meta">{{ c.semester }}{% if c.teacher %} · {{ c.teacher }}{% endif %} · {{ c.exam }}</span>
+          <span class="who"><a href="/admin/guides/{{ c.guide_slug }}/edit">编辑指南</a></span>
+        </div>
+        {% endfor %}
+      {% endfor %}
+    </div>
+  </details>
+  {% endif %}
+{% endfor %}
+{% endblock %}
