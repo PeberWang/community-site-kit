@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Community Site Kit local setup for macOS and Linux.
+# Knowledge Common Kit local setup for macOS and Linux.
 set -euo pipefail
 
 task_python=""

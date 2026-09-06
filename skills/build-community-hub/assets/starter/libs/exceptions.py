@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Community Site Kit custom exceptions."""
+"""Knowledge Common Kit custom exceptions."""
 
 
 class GiftboxException(Exception):

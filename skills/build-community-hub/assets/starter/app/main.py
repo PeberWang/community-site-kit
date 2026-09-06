@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Community Site Kit web app - FastAPI + Jinja2 SSR entry."""
+"""Knowledge Common Kit web app - FastAPI + Jinja2 SSR entry."""
 
 from pathlib import Path
 from urllib.parse import urlsplit

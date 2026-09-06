@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Community Site Kit web entry point: python run.py."""
+"""Knowledge Common Kit web entry point: python run.py."""
 
 import sys
 

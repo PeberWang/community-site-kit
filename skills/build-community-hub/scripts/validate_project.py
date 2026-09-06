@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Validate a generated Community Site Kit project without starting the server."""
+"""Validate a generated Knowledge Common Kit project without starting the server."""
 
 import argparse
 import json

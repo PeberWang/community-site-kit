@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Community Site Kit data models (pydantic).
+"""Knowledge Common Kit data models (pydantic).
 
 Truth sources:
   data/db/*.json     - light metadata (courses/topics/contributions/announcements/...)

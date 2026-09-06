@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Community Site Kit settings (pydantic-settings, .env driven)."""
+"""Knowledge Common Kit settings (pydantic-settings, .env driven)."""
 
 from pathlib import Path
 from typing import Optional

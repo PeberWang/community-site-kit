@@ -1,6 +1,6 @@
 # 你的社区知识站
 
-这是由 Community Site Kit 生成的可运行项目。公开身份与模块开关在 `config/community.json`，私密环境配置在 `.env`，运行数据在 `data/`。
+这是由 Knowledge Common Kit 生成的可运行项目。公开身份与模块开关在 `config/community.json`，私密环境配置在 `.env`，运行数据在 `data/`。
 
 ## 本地运行
 

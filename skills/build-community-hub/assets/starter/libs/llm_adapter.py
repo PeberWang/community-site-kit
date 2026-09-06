@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Community Site Kit - OpenAI-compatible LLM adapter
+Knowledge Common Kit - OpenAI-compatible LLM adapter
 封装OpenAI SDK，对接 DeepSeek 等兼容OpenAI格式的API
 """
 

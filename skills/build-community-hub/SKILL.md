@@ -1,6 +1,6 @@
 ---
 name: build-community-hub
-description: Interview a non-technical community organizer, turn social and governance needs into a scoped product brief, bootstrap and customize a privacy-first knowledge-sharing website, validate it, and prepare a safe deployment and handoff. Use when someone wants to build or adapt a website for a major, department, reading group, student organization, alumni network, mutual-aid group, or other community; when they ask to import this resource pack; or when an existing Community Site Kit project needs modules, roles, workflows, branding, governance, privacy, deployment, or maintenance changes.
+description: Interview a non-technical community organizer, turn social and governance needs into a scoped product brief, bootstrap and customize a privacy-first knowledge-sharing website, validate it, and prepare a safe deployment and handoff. Use when someone wants to build or adapt a website for a major, department, reading group, student organization, alumni network, mutual-aid group, or other community; when they ask to import this resource pack; or when an existing Knowledge Common Kit project needs modules, roles, workflows, branding, governance, privacy, deployment, or maintenance changes.
 ---
 
 # Build Community Hub

@@ -1,4 +1,4 @@
-# Community Site Kit
+# Knowledge Common Kit
 
 把一个专业、读书会、学生组织或地方社群的知识积累，变成可以长期共同维护的网站。
 
@@ -14,7 +14,7 @@ English summary: an agent-guided, privacy-first starter kit for building a gover
 
 ## 最短路径
 
-1. 在 Codex 中直接说：`使用 $skill-installer，从 https://github.com/PeberWang/community-site-kit/tree/main/skills/build-community-hub 安装这个 Skill。`
+1. 在 Codex 中直接说：`使用 $skill-installer，从 https://github.com/PeberWang/knowledge-common-kit/tree/main/skills/build-community-hub 安装这个 Skill。`
 2. 安装后新开一个任务，对 Agent 说：`使用 $build-community-hub，先采访我，不要急着写代码。帮我搭建一个服务于____的社区网站。`
 3. Agent 会先产出需求简报和风险清单，经你确认后再复制并定制模板。
 

@@ -16,7 +16,7 @@ Agent 应先与你完成访谈，生成 `docs/product_brief.md`、`docs/privacy_
 
 在 Codex 中复制这句话：
 
-> 使用 $skill-installer，从 https://github.com/PeberWang/community-site-kit/tree/main/skills/build-community-hub 安装这个 Skill。
+> 使用 $skill-installer，从 https://github.com/PeberWang/knowledge-common-kit/tree/main/skills/build-community-hub 安装这个 Skill。
 
 安装后新开一个任务再开始访谈。如果你的 Agent 不支持自动安装，就下载整个仓库，把 `skills/build-community-hub` 整个目录放进它的 Skills 目录，或让 Agent 直接读取该目录。不要只复制 `SKILL.md`，因为脚本、参考资料和 starter 都是资源包的一部分。
 

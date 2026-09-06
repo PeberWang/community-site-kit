@@ -1,5 +1,5 @@
 [project]
-name = "community-site-kit"
+name = "knowledge-common-kit"
 version = "0.1.0"
 description = "Agent-guided, privacy-first community knowledge website starter"
 requires-python = ">=3.10"
