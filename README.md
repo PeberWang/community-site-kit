@@ -14,10 +14,11 @@ English summary: an agent-guided, privacy-first starter kit for building a gover
 
 ## 最短路径
 
-1. 把整个仓库下载或克隆到本地。
-2. 将 `skills/build-community-hub` 导入支持 Skills 的 Agent。
-3. 对 Agent 说：`使用 $build-community-hub，先采访我，不要急着写代码。帮我搭建一个服务于____的社区网站。`
-4. Agent 会先产出需求简报和风险清单，经你确认后再复制并定制模板。
+1. 在 Codex 中直接说：`使用 $skill-installer，从 https://github.com/PeberWang/community-site-kit/tree/main/skills/build-community-hub 安装这个 Skill。`
+2. 安装后新开一个任务，对 Agent 说：`使用 $build-community-hub，先采访我，不要急着写代码。帮我搭建一个服务于____的社区网站。`
+3. Agent 会先产出需求简报和风险清单，经你确认后再复制并定制模板。
+
+如果你的 Agent 不支持自动安装，就下载整个仓库，并把 `skills/build-community-hub` 整个目录交给它。不要只复制 `SKILL.md`，因为脚本、参考资料和 starter 都属于资源包。
 
 如果你想先自己了解流程，请读 [5 分钟开始](docs/quick_start.md)；如果你不知道该怎么描述需求，请读 [怎样和 Agent 聊](docs/conversation_guide.md)。
 
